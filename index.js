@@ -49,7 +49,7 @@ app.get('/api/persons/:id', (request, response) => {
     const person = persons.find(person => person.id === id)
 
     if (person) {
-        return response.json(persons)
+        return response.json(person)
     } else {
         response.status(404).end()
     }
