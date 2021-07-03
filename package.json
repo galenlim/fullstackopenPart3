@@ -11,13 +11,13 @@
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push heroku main && npm run deploy",
     "logs:prod": "heroku logs --tail"
-
   },
   "author": "Galen",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "mongoose": "^5.13.0",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
