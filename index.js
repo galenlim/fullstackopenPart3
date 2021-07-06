@@ -15,24 +15,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = [
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    }
-]
-
 app.get('/api/persons', (request, response) => {
     Person.find({})
         .then(persons => {
@@ -45,18 +27,20 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/info', (request, response) => {
     const timeReceived = new Date()
-    response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${timeReceived}</p>`)
+
+    Person.count({})
+        .then(result => {
+            response.send(`<p>Phonebook has info for ${result} people</p><p>${timeReceived}</p>`)
+        })
+        .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        return response.json(person)
-    } else {
-        response.status(404).end()
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(person => {
+            return response.json(person)
+        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -79,11 +63,6 @@ app.post('/api/persons', (request, response, next) => {
     if (!body.number) {
         return errorMessage('number is missing')
     }
-
-    //Person.findOne({ name: body.name }).then(result => {
-    //    console.log(result)
-    //    return errorMessage('name must be unique')
-    //})
 
     const person = new Person({
         name: body.name,
